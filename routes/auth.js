@@ -3,13 +3,14 @@ const passport = require("passport");
 require("dotenv").config();
 
 router.get("/login/success", (req, res) => {
+  console.log(req.user);
   if (req.user) {
     res.status(200).json({
       success: true,
       message: "successfull",
       user: req.user,
       //   cookies: req.cookies
-    });
+    })
   }
 });
 
@@ -21,8 +22,17 @@ router.get("/login/failed", (req, res) => {
 });
 
 router.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect(process.env.CLIENT_URL);
+  req.logout(function (err) {
+    if (err) {
+      console.log(err);
+    }
+    req.session.destroy(function (err) {
+      if (err) {
+        console.log(err);
+      }
+      res.redirect(process.env.CLIENT_URL);
+    });
+  });
 });
 
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
